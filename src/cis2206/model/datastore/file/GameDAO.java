@@ -14,23 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import cis2206.model.Employee;
-import cis2206.model.IEmployeeDAO;
+import cis2206.model.Game;
+import cis2206.model.IGameDAO;
 
 /**
- * EmployeeDAO (Data Access Object) handles all interactions with the data
- * store. This version uses a file to store the data. It is not multiuser safe.
+ * GameDAO (Data Access Object) handles all interactions with the data
+ store. This version uses a file to store the data. It is not multiuser safe.
  *
- * @author John Phillips
+ * @author Matt Delosa
  * @version 20160920
  *
  */
-public class EmployeeDAO implements IEmployeeDAO {
+public abstract class GameDAO implements IGameDAO {
 
     protected String fileName = null;
-    protected final List<Employee> myList;
+    protected final List<Game> myList;
 
-    public EmployeeDAO() {
+    public GameDAO() {
         Properties props = new Properties();
         try {
             props.load(new FileInputStream("res/file/db.properties"));
@@ -53,15 +53,15 @@ public class EmployeeDAO implements IEmployeeDAO {
     }
 
     @Override
-    public void createRecord(Employee employee) {
+    public void createRecord(Game employee) {
         myList.add(employee);
         writeList();
     }
 
     @Override
-    public Employee retrieveRecordById(int id) {
-        for (Employee employee : myList) {
-            if (employee.getEmpId() == id) {
+    public Game retrieveRecordById(int id) {
+        for (Game employee : myList) {
+            if (employee.getgameId() == id) {
                 return employee;
             }
         }
@@ -69,18 +69,17 @@ public class EmployeeDAO implements IEmployeeDAO {
     }
 
     @Override
-    public List<Employee> retrieveAllRecords() {
+    public List<Game> retrieveAllRecords() {
         return myList;
     }
 
     @Override
-    public void updateRecord(Employee updatedEmployee) {
-        for (Employee employee : myList) {
-            if (employee.getEmpId() == updatedEmployee.getEmpId()) {
-                employee.setLastName(updatedEmployee.getLastName());
-                employee.setFirstName(updatedEmployee.getFirstName());
-                employee.setHomePhone(updatedEmployee.getHomePhone());
-                employee.setSalary(updatedEmployee.getSalary());
+    public void updateRecord(Game updatedEmployee) {
+        for (Game employee : myList) {
+            if (employee.getgameId() == updatedEmployee.getgameId()) {
+                employee.setTitle(updatedEmployee.getTitle());
+                employee.setGenre(updatedEmployee.getGenre());
+                
                 break;
             }
         }
@@ -89,8 +88,8 @@ public class EmployeeDAO implements IEmployeeDAO {
 
     @Override
     public void deleteRecord(int id) {
-        for (Employee employee : myList) {
-            if (employee.getEmpId() == id) {
+        for (Game employee : myList) {
+            if (employee.getgameId() == id) {
                 myList.remove(employee);
                 break;
             }
@@ -99,7 +98,7 @@ public class EmployeeDAO implements IEmployeeDAO {
     }
 
     @Override
-    public void deleteRecord(Employee employee) {
+    public void deleteRecord(Game employee) {
         myList.remove(employee);
         writeList();
     }
@@ -111,11 +110,11 @@ public class EmployeeDAO implements IEmployeeDAO {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
                 int id = Integer.parseInt(data[0]);
-                String last = data[1];
-                String first = data[2];
-                String homePhone = data[3];
-                double salary = Double.parseDouble(data[4]);
-                Employee employee = new Employee(id, last, first, homePhone, salary);
+                String title = data[1];
+                String genre = data[2];
+                
+                
+                Game employee = new Game(id, title, genre);
                 myList.add(employee);
             }
         } catch (IOException ioe) {
@@ -126,13 +125,13 @@ public class EmployeeDAO implements IEmployeeDAO {
     private void writeList() {
         Path path = Paths.get(fileName);
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            for (Employee employee : myList) {
+            for (Game employee : myList) {
                 writer.write(String.format("%d,%s,%s,%s,%.2f\n",
-                        employee.getEmpId(),
-                        employee.getLastName(),
-                        employee.getFirstName(),
-                        employee.getHomePhone(),
-                        employee.getSalary()));
+                        employee.getgameId(),
+                        employee.getTitle(),
+                        employee.getGenre()
+                        
+                      ));
             }
         } catch (IOException ioe) {
             System.out.println("Write file error with " + ioe.getMessage());
@@ -143,15 +142,21 @@ public class EmployeeDAO implements IEmployeeDAO {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        for (Employee employee : myList) {
+        for (Game employee : myList) {
             sb.append(String.format("%5d : %s, %s, %s, %.2f\n",
-                    employee.getEmpId(),
-                    employee.getLastName(),
-                    employee.getFirstName(),
-                    employee.getHomePhone(),
-                    employee.getSalary()));
+                   employee.getgameId(),
+                        employee.getTitle(),
+                        employee.getGenre()));
+                        
         }
 
         return sb.toString();
     }
+
+    /**
+     *
+     * @param employee
+     */
+ 
+ 
 }

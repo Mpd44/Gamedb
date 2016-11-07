@@ -6,7 +6,7 @@ import java.util.Scanner;
  * Prompts for and then validates console based input. Based in part on code
  * from Murach's Java SE 6 by Joel Murach, et. al.
  *
- * @author John Phillips
+ * @author Matt Delosa
  * @version 20160920
  */
 public class Validator {

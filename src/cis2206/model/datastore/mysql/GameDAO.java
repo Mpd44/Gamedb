@@ -7,34 +7,33 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cis2206.model.Employee;
-import cis2206.model.IEmployeeDAO;
+import cis2206.model.Game;
+import cis2206.model.IGameDAO;
 
 /**
- * EmployeeDAO (Data Access Object) handles all interactions with the data
- * store. This version uses a MySQL database to store the data. It is multiuser
+ * GameDAO (Data Access Object) handles all interactions with the data
+ store. This version uses a MySQL database to store the data. It is multiuser
  * safe.
  *
- * @author John Phillips
+ * @author Matt Delosa
  * @version 20160920
  *
  */
-public class EmployeeDAO implements IEmployeeDAO {
+public class GameDAO implements IGameDAO {
 
     protected final static boolean DEBUG = true;
 
     @Override
-    public void createRecord(Employee employee) {
+    public void createRecord(Game employee) {
         final String QUERY = "insert into employee "
                 + "(empId, lastName, firstName, homePhone, salary) "
                 + "VALUES (null, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection(); 
                 PreparedStatement stmt = con.prepareStatement(QUERY);) {
-            stmt.setString(1, employee.getLastName());
-            stmt.setString(2, employee.getFirstName());
-            stmt.setString(3, employee.getHomePhone());
-            stmt.setDouble(4, employee.getSalary());
+            stmt.setString(1, employee.getTitle());
+            stmt.setString(2, employee.getGenre());
+         
             if (DEBUG) {
                 System.out.println(stmt.toString());
             }
@@ -46,12 +45,12 @@ public class EmployeeDAO implements IEmployeeDAO {
     }
 
     @Override
-    public Employee retrieveRecordById(int id) {
-        final String QUERY = "select empId, lastName, firstName, homePhone, "
-                + "salary from employee where empId = " + id;
+    public Game retrieveRecordById(int id) {
+        final String QUERY = "select gameId, title, genre "
+                + "from games where gameId = " + id;
         // final String QUERY = "select empId, lastName, firstName, homePhone,
         // salary from employee where empId = ?";
-        Employee emp = null;
+        Game emp = null;
 
         try (Connection con = DBConnection.getConnection(); 
                 PreparedStatement stmt = con.prepareStatement(QUERY)) {
@@ -62,12 +61,10 @@ public class EmployeeDAO implements IEmployeeDAO {
             ResultSet rs = stmt.executeQuery(QUERY);
 
             if (rs.next()) {
-                emp = new Employee(
-                        rs.getInt("empId"), 
-                        rs.getString("lastName"),
-                        rs.getString("firstName"),
-                        rs.getString("homePhone"), 
-                        rs.getDouble("salary"));
+                emp = new Game(
+                        rs.getInt("gameId"), 
+                        rs.getString("Title"),
+                        rs.getString("Genre"));
             }
         } catch (SQLException ex) {
             System.out.println("retrieveRecordById SQLException: " 
@@ -78,10 +75,10 @@ public class EmployeeDAO implements IEmployeeDAO {
     }
 
     @Override
-    public List<Employee> retrieveAllRecords() {
-        final List<Employee> myList = new ArrayList<>();
-        final String QUERY = "select empId, lastName, firstName, homePhone, "
-                + "salary from employee";
+    public List<Game> retrieveAllRecords() {
+        final List<Game> myList = new ArrayList<>();
+        final String QUERY = "select gameId, title, genre, "
+                + " from games";
 
         try (Connection con = DBConnection.getConnection(); 
                 PreparedStatement stmt = con.prepareStatement(QUERY)) {
@@ -91,12 +88,10 @@ public class EmployeeDAO implements IEmployeeDAO {
             ResultSet rs = stmt.executeQuery(QUERY);
 
             while (rs.next()) {
-                myList.add(new Employee(
-                        rs.getInt("empId"), 
-                        rs.getString("lastName"), 
-                        rs.getString("firstName"),
-                        rs.getString("homePhone"), 
-                        rs.getDouble("salary")));
+                myList.add(new Game(
+                        rs.getInt("gameId"), 
+                        rs.getString("Title"), 
+                        rs.getString("Genre")));
             }
         } catch (SQLException ex) {
             System.out.println("retrieveAllRecords SQLException: " + ex.getMessage());
@@ -106,17 +101,16 @@ public class EmployeeDAO implements IEmployeeDAO {
     }
 
     @Override
-    public void updateRecord(Employee updatedEmployee) {
-        final String QUERY = "update employee set lastName=?, firstName=?, "
-                + "homePhone=?, salary=? where empId=?";
+    public void updateRecord(Game updatedGame) {
+        final String QUERY = "update games set Title=?, Genre=?, "
+                + " where gameId=?";
 
         try (Connection con = DBConnection.getConnection(); 
                 PreparedStatement stmt = con.prepareStatement(QUERY)) {
-            stmt.setString(1, updatedEmployee.getLastName());
-            stmt.setString(2, updatedEmployee.getFirstName());
-            stmt.setString(3, updatedEmployee.getHomePhone());
-            stmt.setDouble(4, updatedEmployee.getSalary());
-            stmt.setInt(5, updatedEmployee.getEmpId());
+            stmt.setString(1, updatedGame.getTitle());
+            stmt.setString(2, updatedGame.getGenre());
+            
+            stmt.setInt(5, updatedGame.getGameId());
             if (DEBUG) {
                 System.out.println(stmt.toString());
             }
@@ -128,7 +122,7 @@ public class EmployeeDAO implements IEmployeeDAO {
 
     @Override
     public void deleteRecord(int id) {
-        final String QUERY = "delete from employee where empId = ?";
+        final String QUERY = "delete from games where gameId = ?";
 
         try (Connection con = DBConnection.getConnection(); 
                 PreparedStatement stmt = con.prepareStatement(QUERY)) {
@@ -143,12 +137,12 @@ public class EmployeeDAO implements IEmployeeDAO {
     }
 
     @Override
-    public void deleteRecord(Employee employee) {
-        final String QUERY = "delete from employee where empId = ?";
+    public void deleteRecord(Game employee) {
+        final String QUERY = "delete from games where gameId = ?";
 
         try (Connection con = DBConnection.getConnection(); 
                 PreparedStatement stmt = con.prepareStatement(QUERY)) {
-            stmt.setInt(1, employee.getEmpId());
+            stmt.setInt(1, employee.getGameId());
             if (DEBUG) {
                 System.out.println(stmt.toString());
             }
@@ -162,7 +156,7 @@ public class EmployeeDAO implements IEmployeeDAO {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        for (Employee employee : retrieveAllRecords()) {
+        for (Game employee : retrieveAllRecords()) {
             sb.append(employee.toString()).append("\n");
         }
 

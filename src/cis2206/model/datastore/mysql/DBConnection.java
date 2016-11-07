@@ -11,7 +11,7 @@ import java.util.Properties;
  * Get a connection to the database. DBConnection is based on example code from
  * http://www.journaldev.com/2471/package com.journaldev.jdbc
  *
- * @author John Phillips
+ * @author Matt Delosa
  * @version 20151015
  *
  */
